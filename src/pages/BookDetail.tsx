@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Heart, ShoppingCart, Star, Truck, RotateCw, Check, ChevronDown, ChevronUp } from "lucide-react";
@@ -9,7 +8,7 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import FeaturedSlider from "@/components/ui/FeaturedSlider";
 import { books } from "@/lib/data";
-import { toast } from "@/components/ui/sonner";
+import { toast } from "sonner";
 
 const BookDetail = () => {
   const { id } = useParams();
@@ -19,18 +18,15 @@ const BookDetail = () => {
   const [activeTab, setActiveTab] = useState("description");
   const [isExpanded, setIsExpanded] = useState(false);
   
-  // Get related books (same category)
   const relatedBooks = books
     .filter(b => b.category === book?.category && b.id !== book?.id)
     .slice(0, 8);
   
-  // Handle scroll to top on page load or book change
   useEffect(() => {
     window.scrollTo(0, 0);
     setBook(books.find(b => b.id === id));
     setIsLoading(true);
     
-    // Simulate loading delay
     const timer = setTimeout(() => {
       setIsLoading(false);
     }, 500);
@@ -70,7 +66,6 @@ const BookDetail = () => {
     );
   }
   
-  // Calculate discount percentage
   const discountPercentage = book.originalPrice 
     ? Math.round(((book.originalPrice - book.price) / book.originalPrice) * 100) 
     : 0;
@@ -79,11 +74,9 @@ const BookDetail = () => {
     <div className="min-h-screen flex flex-col">
       <Navbar />
       
-      {/* Book Detail Section */}
       <section className="pt-32 pb-16">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-            {/* Book Image */}
             <div className="flex justify-center">
               <div className="relative w-full max-w-md aspect-[2/3] overflow-hidden rounded-lg book-shadow">
                 {isLoading ? (
@@ -104,7 +97,6 @@ const BookDetail = () => {
               </div>
             </div>
             
-            {/* Book Info */}
             <div className="animate-slide-up">
               <div className="space-y-1">
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -118,7 +110,6 @@ const BookDetail = () => {
                 </div>
                 <h1 className="text-3xl md:text-4xl font-display font-medium">{book.title}</h1>
                 
-                {/* Rating */}
                 <div className="flex items-center gap-2 mt-2">
                   <div className="flex">
                     {Array.from({ length: 5 }).map((_, index) => (
@@ -135,7 +126,6 @@ const BookDetail = () => {
                 </div>
               </div>
               
-              {/* Price */}
               <div className="mt-6 flex items-end gap-2">
                 <span className="text-3xl font-medium">${book.price.toFixed(2)}</span>
                 {book.originalPrice && (
@@ -145,12 +135,10 @@ const BookDetail = () => {
                 )}
               </div>
               
-              {/* Short Description */}
               <p className="mt-4 text-muted-foreground">
                 {book.description.substring(0, 150)}...
               </p>
               
-              {/* Availability */}
               <div className="mt-6 flex items-center gap-2">
                 <div className="h-3 w-3 rounded-full bg-green-500"></div>
                 <span className="text-sm font-medium">
@@ -158,7 +146,6 @@ const BookDetail = () => {
                 </span>
               </div>
               
-              {/* Add to Cart Actions */}
               <div className="mt-6 flex items-stretch gap-2">
                 <div className="flex border border-border rounded-lg overflow-hidden">
                   <button 
@@ -191,7 +178,6 @@ const BookDetail = () => {
                 </Button>
               </div>
               
-              {/* Shipping Info */}
               <div className="mt-8 space-y-4">
                 <div className="flex items-start gap-3">
                   <Truck className="h-5 w-5 text-primary shrink-0 mt-0.5" />
@@ -216,7 +202,6 @@ const BookDetail = () => {
                 </div>
               </div>
               
-              {/* Tags */}
               <div className="mt-8">
                 <p className="text-sm text-muted-foreground mb-2">Tags:</p>
                 <div className="flex flex-wrap gap-2">
@@ -234,7 +219,6 @@ const BookDetail = () => {
             </div>
           </div>
           
-          {/* Book Details Tabs */}
           <div className="mt-16">
             <Tabs defaultValue="description" onValueChange={setActiveTab}>
               <TabsList className="grid w-full md:w-auto grid-cols-3 md:inline-flex md:gap-4">
@@ -259,7 +243,6 @@ const BookDetail = () => {
                   </p>
                 </div>
                 
-                {/* Read more/less toggle */}
                 {activeTab === "description" && (
                   <Button 
                     variant="ghost" 
@@ -425,7 +408,6 @@ const BookDetail = () => {
         </div>
       </section>
       
-      {/* Related Books Section */}
       <section className="py-16 bg-secondary/50">
         <div className="container mx-auto px-4">
           <FeaturedSlider 
@@ -441,7 +423,6 @@ const BookDetail = () => {
   );
 };
 
-// Review Item component
 const ReviewItem = ({ 
   name, 
   rating, 

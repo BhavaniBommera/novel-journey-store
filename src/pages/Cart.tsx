@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, Minus, Plus, ShoppingCart, Trash2, X } from "lucide-react";
@@ -10,7 +9,7 @@ import Footer from "@/components/layout/Footer";
 import FeaturedSlider from "@/components/ui/FeaturedSlider";
 import { books, Book } from "@/lib/data";
 import { cn } from "@/lib/utils";
-import { toast } from "@/components/ui/sonner";
+import { toast } from "sonner";
 
 interface CartItem {
   book: Book;
@@ -26,11 +25,9 @@ const Cart = () => {
   const [couponCode, setCouponCode] = useState("");
   const [discount, setDiscount] = useState(0);
   
-  // Handle scroll to top on page load
   useEffect(() => {
     window.scrollTo(0, 0);
     
-    // Set recommended books (random selection of featured books)
     const featured = books.filter(book => book.featured);
     const shuffled = [...featured].sort(() => 0.5 - Math.random());
     setRecommendedBooks(shuffled.slice(0, 6));
@@ -70,7 +67,6 @@ const Cart = () => {
     }
   };
   
-  // Calculate totals
   const subtotal = cartItems.reduce(
     (sum, item) => sum + item.book.price * item.quantity, 
     0
@@ -83,7 +79,6 @@ const Cart = () => {
     <div className="min-h-screen flex flex-col">
       <Navbar />
       
-      {/* Cart Section */}
       <section className="pt-32 pb-16">
         <div className="container mx-auto px-4">
           <h1 className="text-3xl md:text-4xl font-display font-medium mb-8">
@@ -92,10 +87,8 @@ const Cart = () => {
           
           {cartItems.length > 0 ? (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              {/* Cart Items */}
               <div className="lg:col-span-2">
                 <div className="bg-white rounded-lg border border-border overflow-hidden">
-                  {/* Header */}
                   <div className="hidden md:grid grid-cols-12 gap-4 p-4 bg-secondary/50 text-sm font-medium">
                     <div className="col-span-6">Product</div>
                     <div className="col-span-2 text-center">Price</div>
@@ -103,14 +96,12 @@ const Cart = () => {
                     <div className="col-span-2 text-right">Total</div>
                   </div>
                   
-                  {/* Cart Items */}
                   <div className="divide-y divide-border">
                     {cartItems.map(item => (
                       <div 
                         key={item.book.id} 
                         className="py-6 px-4 md:grid md:grid-cols-12 md:gap-4 md:items-center animate-fade-in"
                       >
-                        {/* Product */}
                         <div className="md:col-span-6 flex gap-4 items-center">
                           <Link to={`/book/${item.book.id}`} className="shrink-0">
                             <img 
@@ -128,7 +119,6 @@ const Cart = () => {
                             </Link>
                             <p className="text-sm text-muted-foreground">{item.book.author.name}</p>
                             
-                            {/* Mobile only price */}
                             <div className="flex justify-between items-center mt-2 md:hidden">
                               <p className="font-medium">${item.book.price.toFixed(2)}</p>
                               <button 
@@ -141,12 +131,10 @@ const Cart = () => {
                           </div>
                         </div>
                         
-                        {/* Price - Desktop only */}
                         <div className="hidden md:flex md:col-span-2 justify-center">
                           <p className="font-medium">${item.book.price.toFixed(2)}</p>
                         </div>
                         
-                        {/* Quantity */}
                         <div className="md:col-span-2 flex justify-center mt-4 md:mt-0">
                           <div className="flex items-center rounded-md border border-border">
                             <button 
@@ -167,7 +155,6 @@ const Cart = () => {
                           </div>
                         </div>
                         
-                        {/* Total - Desktop */}
                         <div className="hidden md:flex md:col-span-2 justify-end items-center gap-4">
                           <p className="font-medium">
                             ${(item.book.price * item.quantity).toFixed(2)}
@@ -180,7 +167,6 @@ const Cart = () => {
                           </button>
                         </div>
                         
-                        {/* Mobile only total */}
                         <div className="flex justify-end mt-4 md:hidden">
                           <p className="font-medium">
                             Total: ${(item.book.price * item.quantity).toFixed(2)}
@@ -190,7 +176,6 @@ const Cart = () => {
                     ))}
                   </div>
                   
-                  {/* Cart actions */}
                   <div className="p-4 bg-secondary/50 flex flex-wrap items-center justify-between gap-4">
                     <Button variant="outline" asChild>
                       <Link to="/shop" className="flex items-center gap-2">
@@ -210,7 +195,6 @@ const Cart = () => {
                 </div>
               </div>
               
-              {/* Order Summary */}
               <div className="lg:col-span-1">
                 <div className="bg-white rounded-lg border border-border overflow-hidden animate-slide-up">
                   <div className="p-4 bg-secondary/50">
@@ -244,7 +228,6 @@ const Cart = () => {
                       <span className="font-medium">${total.toFixed(2)}</span>
                     </div>
                     
-                    {/* Coupon code */}
                     <div className="pt-4">
                       <p className="text-sm mb-2">Apply Coupon Code</p>
                       <div className="flex gap-2">
@@ -270,7 +253,6 @@ const Cart = () => {
                       Proceed to Checkout
                     </Button>
                     
-                    {/* Payment methods */}
                     <div className="pt-4">
                       <p className="text-xs text-center text-muted-foreground">
                         Secure Payments
@@ -302,7 +284,6 @@ const Cart = () => {
         </div>
       </section>
       
-      {/* Recommended Books Section */}
       {cartItems.length > 0 && (
         <section className="py-16 bg-secondary/50">
           <div className="container mx-auto px-4">
