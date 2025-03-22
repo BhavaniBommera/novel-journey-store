@@ -1,10 +1,10 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { Book, Eye, EyeOff, Facebook, Github, Loader2, X } from "lucide-react";
+import { Link } from "react-router-dom";
+import { AlertCircle, Book, Check, Eye, EyeOff, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Card,
   CardContent,
@@ -13,54 +13,104 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { toast } from "sonner";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { cn } from "@/lib/utils";
 
 const Register = () => {
+  // Form state
   const [isLoading, setIsLoading] = useState(false);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const [formData, setFormData] = useState({
+    fullName: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
-  const navigate = useNavigate();
-
+  const [acceptTerms, setAcceptTerms] = useState(false);
+  const [errors, setErrors] = useState({});
+  
+  // Handle input changes
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+    
+    // Clear error when user starts typing
+    if (errors[name]) {
+      setErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors[name];
+        return newErrors;
+      });
+    }
+  };
+  
+  // Form validation
+  const validateForm = () => {
+    const newErrors = {};
+    
+    if (!formData.fullName.trim()) {
+      newErrors.fullName = "Name is required";
+    }
+    
+    if (!formData.email.trim()) {
+      newErrors.email = "Email is required";
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = "Email address is invalid";
+    }
+    
+    if (!formData.password) {
+      newErrors.password = "Password is required";
+    } else if (formData.password.length < 8) {
+      newErrors.password = "Password must be at least 8 characters";
+    }
+    
+    if (formData.password !== formData.confirmPassword) {
+      newErrors.confirmPassword = "Passwords do not match";
+    }
+    
+    if (!acceptTerms) {
+      newErrors.terms = "You must accept the terms and conditions";
+    }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+  
+  // Form submission
   const handleSubmit = (e) => {
     e.preventDefault();
-    setErrorMessage("");
-
-    // Form validation
-    if (!email) {
-      setErrorMessage("Please enter your email address");
-      return;
+    
+    if (validateForm()) {
+      setIsLoading(true);
+      
+      // Simulate registration (would be an API call in a real app)
+      setTimeout(() => {
+        setIsLoading(false);
+        toast.success("Registration successful", {
+          description: "Your account has been created. You can now log in.",
+        });
+        
+        // Reset form
+        setFormData({
+          fullName: "",
+          email: "",
+          password: "",
+          confirmPassword: "",
+        });
+        setAcceptTerms(false);
+        
+        // Redirect to login
+        setTimeout(() => {
+          window.location.href = "/login";
+        }, 2000);
+      }, 1500);
     }
-
-    if (!password) {
-      setErrorMessage("Please enter your password");
-      return;
-    }
-
-    if (password.length < 6) {
-      setErrorMessage("Password must be at least 6 characters");
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      setErrorMessage("Passwords do not match");
-      return;
-    }
-
-    // Simulate registration
-    setIsLoading(true);
-
-    setTimeout(() => {
-      setIsLoading(false);
-
-      // For demo purposes, simulate registration success
-      navigate("/login");
-    }, 1500);
   };
 
   return (
@@ -89,15 +139,27 @@ const Register = () => {
 
               <CardContent className="space-y-4">
                 {/* Error message */}
-                {errorMessage && (
+                {Object.keys(errors).length > 0 && (
                   <div className="bg-destructive/10 text-destructive text-sm p-3 rounded-md flex items-start gap-2 animate-shake">
-                    <X className="h-4 w-4 mt-0.5 shrink-0" />
-                    <span>{errorMessage}</span>
+                    <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" />
+                    <span>{errors[Object.keys(errors)[0]]}</span>
                   </div>
                 )}
 
                 <form onSubmit={handleSubmit}>
                   <div className="space-y-4">
+                    {/* Full Name */}
+                    <div className="space-y-2">
+                      <Label htmlFor="fullName">Full Name</Label>
+                      <Input
+                        id="fullName"
+                        type="text"
+                        placeholder="John Doe"
+                        value={formData.fullName}
+                        onChange={handleChange}
+                      />
+                    </div>
+
                     {/* Email */}
                     <div className="space-y-2">
                       <Label htmlFor="email">Email</Label>
@@ -105,8 +167,8 @@ const Register = () => {
                         id="email"
                         type="email"
                         placeholder="you@example.com"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
+                        value={formData.email}
+                        onChange={handleChange}
                       />
                     </div>
 
@@ -118,8 +180,8 @@ const Register = () => {
                           id="password"
                           type={showPassword ? "text" : "password"}
                           placeholder="••••••••"
-                          value={password}
-                          onChange={(e) => setPassword(e.target.value)}
+                          value={formData.password}
+                          onChange={handleChange}
                         />
                         <button
                           type="button"
@@ -143,8 +205,8 @@ const Register = () => {
                           id="confirmPassword"
                           type={showConfirmPassword ? "text" : "password"}
                           placeholder="••••••••"
-                          value={confirmPassword}
-                          onChange={(e) => setConfirmPassword(e.target.value)}
+                          value={formData.confirmPassword}
+                          onChange={handleChange}
                         />
                         <button
                           type="button"
@@ -159,6 +221,14 @@ const Register = () => {
                         </button>
                       </div>
                     </div>
+
+                    <Checkbox
+                      id="terms"
+                      checked={acceptTerms}
+                      onChange={(e) => setAcceptTerms(e.target.checked)}
+                    >
+                      <Label htmlFor="terms">I accept the terms and conditions</Label>
+                    </Checkbox>
 
                     <Button
                       type="submit"

@@ -1,116 +1,73 @@
-import { useParams } from "react-router-dom";
-import { toast } from "sonner";
-import { useState, useEffect } from "react";
-import { Book } from "@/lib/data";
-import { Star } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useParams, Link } from "react-router-dom";
+import { Heart, ShoppingCart, Star, Truck, RotateCw, Check, ChevronDown, ChevronUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import FeaturedSlider from "@/components/ui/FeaturedSlider";
+import { books } from "@/lib/data";
+import { toast } from "sonner";
 
 const BookDetail = () => {
   const { id } = useParams();
-  const [book, setBook] = useState(null);
+  const [book, setBook] = useState(books.find(b => b.id === id));
+  const [quantity, setQuantity] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
-  const [reviewText, setReviewText] = useState("");
-  const [reviews, setReviews] = useState([
-    {
-      id: "review1",
-      user: {
-        name: "John Doe",
-        avatarUrl: "https://github.com/shadcn.png",
-      },
-      rating: 5,
-      comment:
-        "An absolutely captivating read! The characters were so well-developed, and the plot kept me hooked from beginning to end. Highly recommended!",
-      date: "2024-01-20",
-    },
-    {
-      id: "review2",
-      user: {
-        name: "Jane Smith",
-        avatarUrl: "https://avatars.githubusercontent.com/u/872844?v=4",
-      },
-      rating: 4,
-      comment:
-        "A great book with a unique storyline. I enjoyed the author's writing style and the unexpected twists. Will definitely read more from this author.",
-      date: "2024-02-15",
-    },
-  ]);
-
+  const [activeTab, setActiveTab] = useState("description");
+  const [isExpanded, setIsExpanded] = useState(false);
+  
+  const relatedBooks = books
+    .filter(b => b.category === book?.category && b.id !== book?.id)
+    .slice(0, 8);
+  
   useEffect(() => {
-    // Simulate fetching book data
-    setTimeout(() => {
-      const mockBook = {
-        id: "book1",
-        title: "The Secret Garden",
-        author: {
-          name: "Frances Hodgson Burnett",
-        },
-        coverImage:
-          "https://m.media-amazon.com/images/I/51j4JtOxGgL._AC_UF1000,1000_QL80_.jpg",
-        description:
-          "A young, orphaned girl discovers a hidden garden on her uncle's estate, leading to a journey of healing and self-discovery.",
-        price: 9.99,
-        originalPrice: 12.99,
-        rating: 4.5,
-        reviewCount: 120,
-        bestSeller: true,
-        newRelease: false,
-      };
-
-      setBook(mockBook);
+    window.scrollTo(0, 0);
+    setBook(books.find(b => b.id === id));
+    setIsLoading(true);
+    
+    const timer = setTimeout(() => {
       setIsLoading(false);
-    }, 1000);
+    }, 500);
+    
+    return () => clearTimeout(timer);
   }, [id]);
-
-  const handleReviewSubmit = (e) => {
-    e.preventDefault();
-
-    if (!reviewText.trim()) {
-      toast.error("Please enter your review");
-      return;
-    }
-
-    const newReview = {
-      id: `review${reviews.length + 1}`,
-      user: {
-        name: "Current User", // Replace with actual user data
-        avatarUrl: "https://github.com/shadcn.png", // Replace with actual user avatar
-      },
-      rating: 5, // You might want to add a rating system
-      comment: reviewText,
-      date: new Date().toLocaleDateString(),
-    };
-
-    setReviews([newReview, ...reviews]);
-    setReviewText("");
-    toast.success("Review submitted successfully!");
+  
+  const handleAddToCart = () => {
+    toast.success("Added to cart", {
+      description: `${book?.title} (${quantity}) has been added to your cart.`,
+    });
   };
-
-  if (isLoading) {
-    return <div>Loading book details...</div>;
-  }
-
+  
+  const handleAddToWishlist = () => {
+    toast.success("Added to wishlist", {
+      description: `${book?.title} has been added to your wishlist.`,
+    });
+  };
+  
   if (!book) {
-    return <div>Book not found</div>;
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Navbar />
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center">
+            <h1 className="text-2xl font-medium mb-4">Book not found</h1>
+            <p className="text-muted-foreground mb-6">
+              The book you're looking for doesn't exist or has been removed.
+            </p>
+            <Button asChild>
+              <Link to="/shop">Browse Books</Link>
+            </Button>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
   }
-
-  const discountPercentage = book.originalPrice
-    ? Math.round(((book.originalPrice - book.price) / book.originalPrice) * 100)
+  
+  const discountPercentage = book.originalPrice 
+    ? Math.round(((book.originalPrice - book.price) / book.originalPrice) * 100) 
     : 0;
 
   return (
